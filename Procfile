@@ -1,1 +1,1 @@
-web : nodemon server.tsx port 8080
+web : nodemon server.tsx 
