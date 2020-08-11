@@ -1,1 +1,1 @@
-web : nodemon server.tsx 
+web: nodemon server.tsx 
