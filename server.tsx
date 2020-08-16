@@ -4,6 +4,7 @@ const bodyParser = require("body-parser");
 const categoryList = require("./services/categoryService.tsx");
 const itemList = require("./services/itemsService.tsx");
 const cartModule = require("./services/cartService.tsx");
+const searchService = require("./services/searchService.tsx");
 const cartList = cartModule.cartList;
 const addCartItem = cartModule.addcart;
 
@@ -43,6 +44,11 @@ app.post("/cart", (req, res) => {
   let cart = db.collection("cart");
   console.log(cartItem);
   cartModule.addCart(cart, cartItem, req, res);
+});
+
+app.get("/search", (req, res) => {
+  let items = db.collection("items");
+  searchService.searchService(items, req, res);
 });
 
 app.listen(port, () => {
