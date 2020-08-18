@@ -4,6 +4,7 @@ const fetchCart = async (cart, req, res) => {
   let response = {};
   let items = [];
   let price = [];
+  // fetched list of item from the cart
   await cart.get().then((snapshot) => {
     snapshot.docs.forEach((doc) => {
       console.log(doc.data());
@@ -17,17 +18,18 @@ const fetchCart = async (cart, req, res) => {
 
 const addCart = async (cart, item, req, res) => {
   // Add a new document in collection "cities" with ID 'LA'
-  // cart.doc('').set(item);
+  let userExist = false;
   let dataToWrite = {};
   await cart.get().then((snapshot) => {
     snapshot.docs.forEach((doc, index) => {
       let docdata = doc.data();
-      console.log("check user info info info 123333", docdata);
+      console.log("check user info info info 123333", item.itemData);
       // checks whther the user exist
       if (docdata.userInfo.uid === item.uid) {
-        console.log("check user info info info", doc.data().products[index].id);
-        console.log("item data id id id", item.itemData.id);
+        // console.log("check user info info info", doc.data().products[index].id);
+        // console.log("item data id id id", item.itemData.id);
         let products = doc.data().products;
+        userExist = true;
         docdata.quantity = docdata.quantity + 1;
         // checks if the item already is added
         let productExist = false;
@@ -60,27 +62,6 @@ const addCart = async (cart, item, req, res) => {
               parseInt(item.itemData.price.mrp, 10),
           };
         }
-
-        // if (item.itemData.id === doc.data().products[index].id) {
-        //   console.log("checking whether item already exist", item.itemData);
-        //   products[index].qty = doc.data().products[index].qty + 1;
-        //   dataToWrite = {
-        //     products: products,
-        //     quantity: doc.data().quantity + 1,
-        //     totalPrice:
-        //       parseInt(doc.data().totalPrice, 10) +
-        //       parseInt(item.itemData.price.mrp, 10),
-        //   };
-        // } else {
-        //   products.push(item.itemData);
-        //   dataToWrite = {
-        //     products: products,
-        //     quantity: doc.data().quantity + 1,
-        //     totalPrice:
-        //       parseInt(doc.data().totalPrice, 10) +
-        //       parseInt(item.itemData.price.mrp, 10),
-        //   };
-        // }
         console.log("check ffinal doc to write", dataToWrite);
         cart
           .doc(doc.id)
@@ -91,12 +72,29 @@ const addCart = async (cart, item, req, res) => {
           .catch((e) => {
             console.log("error error", e);
           });
-
-        // doc.set({ quantity: doc.data().quantity++ }).then((data) => {
-        //   res.send(data);
-        // });
       }
     });
+    if (!userExist) {
+      console.log("***USER DOES NOT EXIST****");
+      // Adding a new cart for new user
+      let productList = [];
+      productList.push(item.itemData);
+      let newCart = {
+        quantity: 1,
+        totalPrice: item.itemData.price.mrp,
+        products: productList,
+        userInfo: {
+          uid: item.uid,
+        },
+        currency: "rupee",
+      };
+      cart
+        .doc()
+        .add(newCart)
+        .then((recAdded) => {
+          console.log("rec added rec added", recAdded);
+        });
+    }
   });
   return res.send("bihar se aaya mera dost");
 };

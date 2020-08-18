@@ -11,9 +11,6 @@ const SearchService = async (Item, req, res) => {
       }
     });
   });
-  //   if (!searchTerm) {
-  //     return res.send([]);
-  //   }
   return res.send(responseList);
 };
 
