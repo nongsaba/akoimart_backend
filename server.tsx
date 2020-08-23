@@ -5,6 +5,8 @@ const categoryList = require("./services/categoryService.tsx");
 const itemList = require("./services/itemsService.tsx");
 const cartModule = require("./services/cartService.tsx");
 const searchService = require("./services/searchService.tsx");
+const addressService = require("./services/addressService.tsx");
+const orderService = require("./services/orderService.tsx");
 const cartList = cartModule.cartList;
 const addCartItem = cartModule.addcart;
 
@@ -49,6 +51,17 @@ app.post("/cart", (req, res) => {
 app.get("/search", (req, res) => {
   let items = db.collection("items");
   searchService.searchService(items, req, res);
+});
+
+app.get("/address", (req, res) => {
+  let user = db.collection("user");
+  addressService.fetchAddress(user, req, res);
+});
+
+app.post("/order", (req, res) => {
+  let order = db.collection("order");
+  let orderData = req.body;
+  orderService.addOrder(order, orderData, req, res);
 });
 
 app.listen(port, () => {
