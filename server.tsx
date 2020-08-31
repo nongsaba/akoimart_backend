@@ -57,6 +57,18 @@ app.get("/address", (req, res) => {
   let user = db.collection("user");
   addressService.fetchAddress(user, req, res);
 });
+app.put("/address", (req, res) => {
+  let user = db.collection("user");
+  addressService.updateAddress(user, req, res);
+});
+app.post("/address", (req, res) => {
+  let user = db.collection("user");
+  addressService.addAddress(user, req, res);
+});
+app.delete("/address", (req, res) => {
+  let user = db.collection("user");
+  addressService.deleteAddress(user, req, res);
+});
 
 app.post("/order", (req, res) => {
   let order = db.collection("order");

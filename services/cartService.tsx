@@ -1,4 +1,4 @@
-const _ = require("lodash");
+const lodash = require("lodash");
 
 const fetchCart = async (cart, req, res) => {
   let response = {};
@@ -23,9 +23,11 @@ const addCart = async (cart, item, req, res) => {
   await cart.get().then((snapshot) => {
     snapshot.docs.forEach((doc, index) => {
       let docdata = doc.data();
-      console.log("check user info info info 123333", item.itemData);
+
       // checks whther the user exist
       if (docdata.userInfo.uid === item.uid) {
+        console.log("check user info info info 123333", item.uid);
+        console.log("check user info info info db uid", docdata.userInfo.uid);
         // console.log("check user info info info", doc.data().products[index].id);
         // console.log("item data id id id", item.itemData.id);
         let products = doc.data().products;
@@ -33,12 +35,18 @@ const addCart = async (cart, item, req, res) => {
         docdata.quantity = docdata.quantity + 1;
         // checks if the item already is added
         let productExist = false;
-        _.forEach(products, (val, key) => {
+        lodash.forEach(products, (val, key) => {
           if (item.itemData.id === val.id) {
             productExist = true;
             console.log("checking whether item already exist", item.itemData);
-            val.qty = val.qty + 1;
-            products[key] = val;
+            if (item.updateQty !== true) {
+              // Checks if the qty needs to be updated or is it through the item add to cart
+              val.qty = val.qty + 1;
+              products[key] = val;
+            } else {
+              products[key] = item.itemData;
+            }
+
             console.log("checking qty increment", products);
             dataToWrite = {
               products: products,
@@ -52,7 +60,7 @@ const addCart = async (cart, item, req, res) => {
         });
 
         if (!productExist) {
-          console.log("check for product exist flag", productExist);
+          // Product does not exist
           products.push(item.itemData);
           dataToWrite = {
             products: products,
@@ -62,12 +70,13 @@ const addCart = async (cart, item, req, res) => {
               parseInt(item.itemData.price.mrp, 10),
           };
         }
-        console.log("check ffinal doc to write", dataToWrite);
+        console.log("check final doc to write", dataToWrite);
         cart
           .doc(doc.id)
           .update(dataToWrite)
           .then((data) => {
             console.log(data);
+            res.send("data updated");
           })
           .catch((e) => {
             console.log("error error", e);
@@ -93,10 +102,12 @@ const addCart = async (cart, item, req, res) => {
         .add(newCart)
         .then((recAdded) => {
           console.log("rec added rec added", recAdded);
+          res.send("recored added");
         });
     }
   });
-  return res.send("bihar se aaya mera dost");
+  // return res.send("bihar se aaya mera dost");
 };
+
 exports.fetchCart = fetchCart;
 exports.addCart = addCart;
