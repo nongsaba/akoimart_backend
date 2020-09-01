@@ -109,5 +109,43 @@ const addCart = async (cart, item, req, res) => {
   // return res.send("bihar se aaya mera dost");
 };
 
+const deleteCartItem = async (cart, item, req, res) => {
+  let response = [];
+  console.log("product delete data at backend", item);
+  await cart.get().then((snapshot) => {
+    snapshot.docs.forEach((doc) => {
+      // checks whether the user exist
+      if (doc.data().userInfo.uid === item.uid) {
+        console.log("inside same uer id");
+        let tempProducts = doc.data().products;
+        let updatedTotalprice = doc.data().totalPrice;
+        let updatedQty = doc.data().quantity;
+        lodash.forEach(tempProducts, (product, key) => {
+          if (product._id === item.productId) {
+            console.log("****PRODUCT ID EXIST*********");
+            doc.data().totalPrice = doc.data().totalPrice - product.price.mrp;
+            updatedQty = updatedQty - 1;
+            updatedTotalprice = updatedTotalprice - product.price.mrp;
+            tempProducts.splice(key, 1);
+            return false;
+          }
+        });
+        let doctoWrite = {
+          products: tempProducts,
+          quantity: updatedQty,
+          totalPrice: updatedTotalprice,
+        };
+        cart
+          .doc(doc.id)
+          .update(doctoWrite)
+          .then((data) => {
+            res.send("record deleted successfully");
+          });
+      }
+    });
+  });
+};
+
 exports.fetchCart = fetchCart;
 exports.addCart = addCart;
+exports.deleteCartItem = deleteCartItem;

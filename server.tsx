@@ -48,6 +48,11 @@ app.post("/cart", (req, res) => {
   cartModule.addCart(cart, cartItem, req, res);
 });
 
+app.put("/cart", (req, res) => {
+  let item = req.body;
+  let cart = db.collection("cart");
+  cartModule.deleteCartItem(cart, item, req, res);
+});
 app.get("/search", (req, res) => {
   let items = db.collection("items");
   searchService.searchService(items, req, res);
