@@ -23,10 +23,9 @@ const addCart = async (cart, item, req, res) => {
   await cart.get().then((snapshot) => {
     snapshot.docs.forEach((doc, index) => {
       let docdata = doc.data();
-
+      console.log("check user info info info 123333", item.uid);
       // checks whther the user exist
       if (docdata.userInfo.uid === item.uid) {
-        console.log("check user info info info 123333", item.uid);
         console.log("check user info info info db uid", docdata.userInfo.uid);
         // console.log("check user info info info", doc.data().products[index].id);
         // console.log("item data id id id", item.itemData.id);

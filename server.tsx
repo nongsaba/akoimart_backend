@@ -7,6 +7,7 @@ const cartModule = require("./services/cartService.tsx");
 const searchService = require("./services/searchService.tsx");
 const addressService = require("./services/addressService.tsx");
 const orderService = require("./services/orderService.tsx");
+const userService = require("./services/userService.tsx");
 const cartList = cartModule.cartList;
 const addCartItem = cartModule.addcart;
 
@@ -79,6 +80,17 @@ app.post("/order", (req, res) => {
   let order = db.collection("order");
   let orderData = req.body;
   orderService.addOrder(order, orderData, req, res);
+});
+
+app.post("/user", (req, res) => {
+  let user = db.collection("user");
+  let userData = req.body;
+  userService.addUser(user, userData, req, res);
+});
+app.delete("/user", (req, res) => {
+  let user = db.collection("user");
+  let userData = req.body;
+  userService.deleteUser(user, userData, req, res);
 });
 
 app.listen(port, () => {
