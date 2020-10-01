@@ -35,7 +35,7 @@ const addCart = async (cart, item, req, res) => {
         // checks if the item already is added
         let productExist = false;
         lodash.forEach(products, (val, key) => {
-          if (item.itemData.id === val.id) {
+          if (item.itemData.id === val._id) {
             productExist = true;
             console.log("checking whether item already exist", item.itemData);
             if (item.updateQty !== true) {

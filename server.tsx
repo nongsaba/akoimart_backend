@@ -78,8 +78,9 @@ app.delete("/address", (req, res) => {
 
 app.post("/order", (req, res) => {
   let order = db.collection("order");
+  let cart = db.collection("cart");
   let orderData = req.body;
-  orderService.addOrder(order, orderData, req, res);
+  orderService.addOrder(order, orderData, cart, req, res);
 });
 
 app.post("/user", (req, res) => {

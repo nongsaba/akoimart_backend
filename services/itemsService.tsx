@@ -14,17 +14,22 @@ const fetchItems = async (Items, Price, req, res) => {
         }
       });
     });
-  } else {
+  } else if (req.query.catId) {
+    let category = req.query.catId;
+    console.log("211221321312312312312", category);
     await Items.get().then((snapshot) => {
       snapshot.docs.forEach((doc) => {
-        console.log(doc.data());
+        console.log("checking for items", doc.data());
         response = doc.data();
         response["_id"] = doc.id;
         console.log("this is response", response);
-        items.push(response);
+        if (response["category"] === category) {
+          items.push(response);
+        }
       });
     });
   }
+  console.log("to be sent", items);
   return res.send(items);
 };
 

@@ -1,22 +1,25 @@
 const fetchCategories = async (Items, req, res) => {
   let response;
   let items = [];
-  let macha = await Items.get().then((snapshot) => {
+
+  await Items.get().then((snapshot) => {
     if (req.query.catId) {
-      console.log(req.query.catId);
       snapshot.docs.forEach((doc) => {
-        console.log(Object.keys(doc.data()));
         if (Object.keys(doc.data()).length) {
-          console.log(doc.data());
+          let catData = doc.data();
           if (doc.data().parent !== null) {
             if (doc.data().parent.includes(req.query.catId)) {
-              items.push(doc.data());
+              // Checking for category reuqested and sending only the category data
+              if (catData.subCat) {
+                items.push(catData);
+              }
             }
           }
         }
       });
     } else {
       snapshot.docs.forEach((doc) => {
+        // returns all the categories
         console.log(doc.data());
         if (doc.data().parent === null) {
           response = doc.data();
