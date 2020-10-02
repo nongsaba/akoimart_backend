@@ -51,7 +51,7 @@ const addCart = async (cart, item, req, res) => {
               products: products,
               totalPrice:
                 parseInt(doc.data().totalPrice, 10) +
-                parseInt(item.itemData.price.mrp, 10),
+                parseInt(item.itemData.price.mrp, 10) * item.itemData.qty, // total price = mrp * quantity
             };
 
             return false;
@@ -124,7 +124,8 @@ const deleteCartItem = async (cart, item, req, res) => {
             console.log("****PRODUCT ID EXIST*********");
             doc.data().totalPrice = doc.data().totalPrice - product.price.mrp;
             updatedQty = updatedQty - 1;
-            updatedTotalprice = updatedTotalprice - product.price.mrp;
+            updatedTotalprice =
+              updatedTotalprice - product.price.mrp * product.qty;
             tempProducts.splice(key, 1);
             return false;
           }

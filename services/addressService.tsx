@@ -90,7 +90,6 @@ const DeleteAddress = async (Item, req, res) => {
           _.forEach(addressList, (innerval, key) => {
             if (key === data.index) {
               addressList.splice(key, 1);
-
               return false;
             }
           });
