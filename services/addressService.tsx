@@ -8,6 +8,7 @@ const AddressService = async (Item, req, res) => {
     itemSnapshot.docs.forEach((val, key) => {
       if (uid) {
         if (val.data().uid === uid) {
+          console.log("uid checked uid checked");
           responseObj["fname"] = val.data().fname;
           responseObj["lname"] = val.data().lname;
           responseObj["addresses"] = val.data().address;
@@ -43,33 +44,34 @@ const UpdateAddress = async (Item, req, res) => {
               }
             });
           }
-        }
-        // addressList.push(address);
-        if (!keyExist) {
-          _.forEach(addressList, (innerval, key) => {
-            addressList[key]["selected"] = false;
-          });
-          addressList.push(data);
-        }
-        dataToWrite = {
-          address: { adresses: addressList },
-        };
-        if (data._id) {
-          if (data._id === val.id) {
+
+          // addressList.push(address);
+          if (!keyExist) {
+            _.forEach(addressList, (innerval, key) => {
+              addressList[key]["selected"] = false;
+            });
+            addressList.push(data);
+          }
+          dataToWrite = {
+            address: { adresses: addressList },
+          };
+          if (data._id) {
+            if (data._id === val.id) {
+              Item.doc(val.id)
+                .update(dataToWrite)
+                .then((success) => {
+                  console.log("address updated", success);
+                  res.send(success);
+                });
+            }
+          } else {
             Item.doc(val.id)
               .update(dataToWrite)
               .then((success) => {
-                console.log("address updated", success);
+                console.log("Address added", success);
                 res.send(success);
               });
           }
-        } else {
-          Item.doc(val.id)
-            .update(dataToWrite)
-            .then((success) => {
-              console.log("Address added", success);
-              res.send(success);
-            });
         }
       }
     });
