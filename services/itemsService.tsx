@@ -16,7 +16,6 @@ const fetchItems = async (Items, Price, req, res) => {
     });
   } else if (req.query.catId) {
     let category = req.query.catId;
-    console.log("211221321312312312312", category);
     await Items.get().then((snapshot) => {
       snapshot.docs.forEach((doc) => {
         console.log("checking for items", doc.data());

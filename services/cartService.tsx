@@ -37,8 +37,10 @@ const addCart = async (cart, item, req, res) => {
         docdata.quantity = docdata.quantity + 1;
         // checks if the item already is added
         let productExist = false;
+        let priceTobeDeductedFromTotalPrice;
         lodash.forEach(products, (val, key) => {
           if (item.itemData._id === val._id) {
+            priceTobeDeductedFromTotalPrice = val.qty * val.price.mrp; // to be deducted from the totalprice if the item is added
             productExist = true;
             console.log("checking whether item already exist", item.itemData);
             if (item.updateQty !== true) {
@@ -53,7 +55,8 @@ const addCart = async (cart, item, req, res) => {
             dataToWrite = {
               products: products,
               totalPrice:
-                parseInt(doc.data().totalPrice, 10) +
+                parseInt(doc.data().totalPrice, 10) -
+                priceTobeDeductedFromTotalPrice +
                 parseInt(item.itemData.price.mrp, 10) * item.itemData.qty, // total price = mrp * quantity
             };
 
@@ -66,7 +69,7 @@ const addCart = async (cart, item, req, res) => {
           products.push(item.itemData);
           dataToWrite = {
             products: products,
-            quantity: docdata.quantity,
+            quantity: 1,
             totalPrice:
               parseInt(doc.data().totalPrice, 10) +
               parseInt(item.itemData.price.mrp, 10),
@@ -122,13 +125,14 @@ const deleteCartItem = async (cart, item, req, res) => {
         let tempProducts = doc.data().products;
         let updatedTotalprice = doc.data().totalPrice;
         let updatedQty = doc.data().quantity;
+        let deductedMrp;
         lodash.forEach(tempProducts, (product, key) => {
           if (product._id === item.productId) {
             console.log("****PRODUCT ID EXIST*********");
             doc.data().totalPrice = doc.data().totalPrice - product.price.mrp;
-            updatedQty = updatedQty - 1;
-            updatedTotalprice =
-              updatedTotalprice - product.price.mrp * product.qty;
+            updatedQty = updatedQty - product.qty;
+            deductedMrp = product.price.mrp * product.qty;
+            updatedTotalprice = updatedTotalprice - deductedMrp;
             tempProducts.splice(key, 1);
             return false;
           }
