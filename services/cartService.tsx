@@ -26,7 +26,6 @@ const addCart = async (cart, item, req, res) => {
   await cart.get().then((snapshot) => {
     snapshot.docs.forEach((doc, index) => {
       let docdata = doc.data();
-      console.log("check user info info info 123333", item.uid);
       // checks whther the user exist
       if (docdata.userInfo.uid === item.uid) {
         console.log("check user info info info db uid", docdata.userInfo.uid);
@@ -34,7 +33,9 @@ const addCart = async (cart, item, req, res) => {
         // console.log("item data id id id", item.itemData.id);
         let products = doc.data().products;
         userExist = true;
-        docdata.quantity = docdata.quantity + 1;
+        docdata.quantity = docdata.quantity + 1; // add only 1 item to the cart quatity of items is mainained separately
+        console.log("existing quantity", docdata.quantity);
+        console.log("existing quantity 111111", item.itemData.qty);
         // checks if the item already is added
         let productExist = false;
         let priceTobeDeductedFromTotalPrice;
@@ -69,7 +70,7 @@ const addCart = async (cart, item, req, res) => {
           products.push(item.itemData);
           dataToWrite = {
             products: products,
-            quantity: 1,
+            quantity: docdata.quantity,
             totalPrice:
               parseInt(doc.data().totalPrice, 10) +
               parseInt(item.itemData.price.mrp, 10),
