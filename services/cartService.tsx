@@ -1,15 +1,18 @@
 const lodash = require("lodash");
 
 const fetchCart = async (cart, req, res) => {
+  let uid = req.query.uid;
   let response = {};
   let items = [];
   let price = [];
   // fetched list of item from the cart
   await cart.get().then((snapshot) => {
     snapshot.docs.forEach((doc) => {
-      console.log(doc.data());
-      response = doc.data();
-      items.push(response);
+      if (doc.data().userInfo.uid === uid) {
+        console.log(doc.data());
+        response = doc.data();
+        items.push(response);
+      }
     });
   });
   // }
