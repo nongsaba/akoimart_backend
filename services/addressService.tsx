@@ -11,6 +11,7 @@ const AddressService = async (Item, req, res) => {
           console.log("uid checked uid checked");
           responseObj["fname"] = val.data().fname;
           responseObj["lname"] = val.data().lname;
+          responseObj["mobileNumber"] = val.data().mobileNumber;
           responseObj["addresses"] = val.data().address;
           responseObj["_id"] = val.id;
           responseList.push(responseObj);
