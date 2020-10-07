@@ -15,7 +15,6 @@ const fetchCart = async (cart, req, res) => {
       }
     });
   });
-  // }
   return res.send(items);
 };
 
@@ -105,7 +104,7 @@ const addCart = async (cart, item, req, res) => {
       };
       cart
         .doc()
-        .add(newCart)
+        .set(newCart)
         .then((recAdded) => {
           console.log("rec added rec added", recAdded);
           res.send("recored added");
