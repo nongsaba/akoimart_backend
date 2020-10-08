@@ -83,6 +83,11 @@ app.post("/order", (req, res) => {
   orderService.addOrder(order, orderData, cart, req, res);
 });
 
+app.get("/order", (req, res) => {
+  let order = db.collection("order");
+  orderService.getOrder(order, req, res);
+});
+
 app.post("/user", (req, res) => {
   let user = db.collection("user");
   let userData = req.body;
