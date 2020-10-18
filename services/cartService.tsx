@@ -69,10 +69,10 @@ const addCart = async (cart, item, req, res) => {
           products.push(item.itemData);
           dataToWrite = {
             products: products,
-            quantity: docdata.quantity,
+            quantity:doc.data().quantity+1,
             totalPrice:
               parseInt(doc.data().totalPrice, 10) +
-              parseInt(item.itemData.price.mrp, 10),
+              (parseInt(item.itemData.price.mrp, 10)* item.itemData.qty),
           };
         }
         console.log("check final doc to write", dataToWrite);

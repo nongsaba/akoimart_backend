@@ -16,19 +16,21 @@ const fetchItems = async (Items, Price, req, res) => {
     });
   } else if (req.query.catId) {
     let category = req.query.catId;
-    await Items.get().then((snapshot) => {
+    let pageOffset = req.query.offset;
+    console.log("check for page offset", pageOffset)
+    await Items.orderBy('lname').limit(37).offset(parseInt(pageOffset,10)).get().then((snapshot) => {
       snapshot.docs.forEach((doc) => {
-        console.log("checking for items", doc.data());
+       // console.log("checking for items", doc.data());
         response = doc.data();
         response["_id"] = doc.id;
-        console.log("this is response", response);
+      //  console.log("this is response", response);
         if (response["category"] === category) {
           items.push(response);
         }
       });
     });
   }
-  console.log("to be sent", items);
+ // console.log("to be sent", items);
   return res.send(items);
 };
 
