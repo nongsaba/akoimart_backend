@@ -10,7 +10,7 @@ const fetchCategories = async (Items, req, res) => {
           if (doc.data().parent !== null) {
             if (doc.data().parent.includes(req.query.catId)) {
               // Checking for category reuqested and sending only the category data
-              if (catData.subCat) {
+               if (catData.subCat) {
                 items.push(catData);
               }
             }

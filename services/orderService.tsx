@@ -36,7 +36,7 @@ const GetOrders = async (order, req, res) => {
   await order.get().then((ordersSnapshot) => {
     ordersSnapshot.docs.forEach((order) => {
       let responseData = order.data();
-
+      
       if (uid === responseData.uid && responseData.orderStatus === "pending") {
         responseData.orderId = order.id;
         console.log("check order id id id", order.id);
