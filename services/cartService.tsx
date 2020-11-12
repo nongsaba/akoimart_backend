@@ -6,6 +6,7 @@ const fetchCart = async (cart, req, res) => {
   let items = [];
   let price = [];
   // fetched list of item from the cart
+  if(uid){
   await cart.get().then((snapshot) => {
     snapshot.docs.forEach((doc) => {
       if (doc.data().userInfo.uid === uid) {
@@ -15,6 +16,9 @@ const fetchCart = async (cart, req, res) => {
       }
     });
   });
+}else{
+  return res.send("user not logged in")
+}
   return res.send(items);
 };
 

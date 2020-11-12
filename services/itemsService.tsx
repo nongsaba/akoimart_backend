@@ -6,7 +6,9 @@ const fetchItems = async (Items, Price, req, res) => {
   if (req.query.itemId) {
     await Items.get().then((priceSnapshot) => {
       // Fetches items based on item id
+      console.log("check for ite ID",req.query.itemId)
       priceSnapshot.docs.forEach((doc) => {
+        console.log(doc.id)
         if (doc.id == req.query.itemId) {
           response = doc.data();
           response["_id"] = doc.id;

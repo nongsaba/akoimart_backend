@@ -20,9 +20,11 @@ app.use(bodyParser.json());
 var serviceAccount = require("./serviceAccount.json");
 const { reduceEachLeadingCommentRange } = require("typescript");
 
+var serviceAccount = require("./serviceAccount.json");
+
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
-  databaseURL: "https://akoimart-b0188.firebaseio.com",
+  databaseURL: "https://ecopheeapp.firebaseio.com"
 });
 const db = admin.firestore();
 
