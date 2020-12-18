@@ -42,8 +42,6 @@ const fetchItems = async (Items, Price, req, res) => {
     });
   }else if(req.query.discount){
     // if cat ID is undefined
-    let category = req.query.catId;
-    let pageOffset = req.query.offset;
     let discount = req.query.discount
     // add category later
     await Items.get().then((snapshot) => {
