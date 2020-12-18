@@ -57,8 +57,6 @@ const fetchItems = async (Items, Price, req, res) => {
          if(response["price"] && response["price"].discountPercent > discount){
           items.push(response);
          }
-         console.log("dada items",items)
-
        // }
       });
     });
