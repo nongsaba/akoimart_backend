@@ -14,10 +14,9 @@ const fetchItems = async (Items, Price, req, res) => {
         }
       });
     });
-  } else if (req.query.catId) {
+  } else if(req.query.catId && req.query.discount === undefined){
     let category = req.query.catId;
     let pageOffset = req.query.offset;
-    console.log("check for page offset", pageOffset)
     await Items.where('category','==',category).orderBy('lname').get().then((snapshot) => {
       itemsCount = snapshot.docs.length;
       snapshot.docs.forEach((doc) => {
@@ -41,12 +40,35 @@ const fetchItems = async (Items, Price, req, res) => {
        // }
       });
     });
+  }else if(req.query.discount){
+    // if cat ID is undefined
+    let category = req.query.catId;
+    let pageOffset = req.query.offset;
+    let discount = req.query.discount
+    // add category later
+    await Items.get().then((snapshot) => {
+      snapshot.docs.forEach((doc) => {
+       // console.log("checking for items", doc.data());
+        response = doc.data();
+        response["_id"] = doc.id;
+       // items.push(response);
+      //  console.log("this is response", response);
+       // if (response["category"] === category) {
+         if(response["price"] && response["price"].discountPercent > discount){
+          items.push(response);
+         }
+         console.log("dada items",items)
+
+       // }
+      });
+    });
+
   }
  // console.log("to be sent", items);
  response = {
    items,
    meta:{
-     count:itemsCount
+     count:items.length
    }
  }
   return res.send(response);
