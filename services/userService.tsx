@@ -7,8 +7,6 @@ const AddUser = async (user, userData, req, res) => {
   await user.get().then((snapshot) => {
     let userExist = false;
     snapshot.docs.forEach((doc) => {
-      console.log(uid);
-      console.log(doc.data().uid);
       if (doc.data().uid === uid) {
         userExist = true;
       }
@@ -23,7 +21,10 @@ const AddUser = async (user, userData, req, res) => {
           return res.send("user added");
         });
     }
-    return "existing user";
+    if(userExist){
+      console.log("user exist");
+      return res.send("existing user");
+    }
   });
 };
 
