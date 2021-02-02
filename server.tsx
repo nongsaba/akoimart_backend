@@ -99,6 +99,12 @@ app.delete("/user", (req, res) => {
   userService.deleteUser(user, userData, req, res);
 });
 
+app.get("/partners",(req, res)=>{
+  let partners = db.collection("partnerLocator");
+
+  addressService.fetchPartners(partners, req, res);
+})
+
 app.listen(port, () => {
   // tslint:disable-next-line:no-console
   console.log(`server started at http://localhost:${port}`);

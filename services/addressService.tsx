@@ -111,6 +111,31 @@ const DeleteAddress = async (Item, req, res) => {
   });
 };
 
+// interface partnersInterface{
+//   partners:Array<any>
+// }
+
+const fetchPartners = async (partners,req, res) =>{
+   let picodeForPartner = req.query.pincode     
+   let partnerExist = false;
+   let responseData = {partners:[]};
+   let partnersList = await partners.where("pincode","==",parseInt(picodeForPartner,10)).get()
+  
+   if(partnersList.empty){
+     return res.send("No available partners for store pick up")
+   }
+   
+ 
+   partnersList.docs.forEach((item)=>{
+           partnerExist = true
+           responseData.partners = item.data().partnerDetails;
+           res.send(responseData)
+    })
+   
+
+
+}
+
 // const AddAddress = async (Item, req, res) => {
 //   let uid = req.query.uid;
 //   let data = req.body;
@@ -149,3 +174,4 @@ const DeleteAddress = async (Item, req, res) => {
 exports.fetchAddress = AddressService;
 exports.updateAddress = UpdateAddress;
 exports.deleteAddress = DeleteAddress;
+exports.fetchPartners = fetchPartners;

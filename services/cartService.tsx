@@ -22,6 +22,7 @@ const addCart = async (cart, item, req, res) => {
   // Add a new document in collection "cities" with ID 'LA'
   let userExist = false;
   let dataToWrite = {};
+  console.log("checking for item user ID on cart", item.uid)
   await cart.get().then((snapshot) => {
     snapshot.docs.forEach((doc, index) => {
       let docdata = doc.data();
