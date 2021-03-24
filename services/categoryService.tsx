@@ -1,7 +1,7 @@
 const fetchCategories = async (Items, req, res) => {
   let response;
   let items = [];
-
+  console.log("checking for query",req.query)
   await Items.get().then((snapshot) => {
     if (req.query.catId) {
       snapshot.docs.forEach((doc) => {

@@ -8,9 +8,6 @@ const OrderService = async (order, orderData, cart, req, res) => {
       console.log("order data", data);
       cart.get().then((snapshot) => {
         snapshot.docs.forEach((doc) => {
-          console.log("inside cart");
-          console.log(doc.data().uid);
-          console.log(orderData.uid);
           if (doc.data().userInfo.uid === orderData.uid) {
             let cartProduct = doc.data();
             cartProduct.products = [];

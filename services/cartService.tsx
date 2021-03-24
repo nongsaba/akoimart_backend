@@ -34,8 +34,6 @@ const addCart = async (cart, item, req, res) => {
         let products = doc.data().products;
         userExist = true;
         docdata.quantity = docdata.quantity + 1; // add only 1 item to the cart quatity of items is mainained separately
-        console.log("existing quantity", docdata.quantity);
-        console.log("existing quantity 111111", item.itemData.qty);
         // checks if the item already is added
         let productExist = false;
         let priceTobeDeductedFromTotalPrice;
