@@ -6,6 +6,7 @@ const fetchCart = async (cart, req, res) => {
   let items = [];
   let price = [];
   // fetched list of item from the cart
+  if(uid){
   await cart.get().then((snapshot) => {
     snapshot.docs.forEach((doc) => {
       if (doc.data().userInfo.uid === uid) {
@@ -15,6 +16,9 @@ const fetchCart = async (cart, req, res) => {
       }
     });
   });
+}else{
+  return res.send("user not logged in")
+}
   return res.send(items);
 };
 
@@ -22,43 +26,43 @@ const addCart = async (cart, item, req, res) => {
   // Add a new document in collection "cities" with ID 'LA'
   let userExist = false;
   let dataToWrite = {};
-  console.log("checking for item user ID on cart", item.uid)
+
   await cart.get().then((snapshot) => {
     snapshot.docs.forEach((doc, index) => {
       let docdata = doc.data();
       // checks whther the user exist
       if (docdata.userInfo.uid === item.uid) {
-        console.log("check user info info info db uid", docdata.userInfo.uid);
-        // console.log("check user info info info", doc.data().products[index].id);
-        // console.log("item data id id id", item.itemData.id);
+
         let products = doc.data().products;
         userExist = true;
-        docdata.quantity = docdata.quantity + 1; // add only 1 item to the cart quatity of items is mainained separately
+        //docdata.quantity = docdata.quantity + 1; // add only 1 item to the cart quatity of items is mainained separately
         // checks if the item already is added
         let productExist = false;
+        let quantity;
         let priceTobeDeductedFromTotalPrice;
         lodash.forEach(products, (val, key) => {
           if (item.itemData._id === val._id) {
-            priceTobeDeductedFromTotalPrice = val.qty * val.price.mrp; // to be deducted from the totalprice if the item is added
+            priceTobeDeductedFromTotalPrice = val.qty * (val.price.mrp - val.price.discount); // to be deducted from the totalprice if the item is added
             productExist = true;
-            console.log("checking whether item already exist", item.itemData);
-            if (item.updateQty !== true) {
+            if (!item.updateQty) {
               // Checks if the qty needs to be updated or is it through the item add to cart
-              val.qty = val.qty + 1;
               products[key] = val;
+              quantity = docdata.quantity + val.qty;
             } else {
               products[key] = item.itemData;
+              /* updates the total quantity on qty change */
+              quantity = (docdata.quantity - val.qty) + item.qty; 
             }
-
-            console.log("checking qty increment", products);
+            let currentPrice = item.itemData.price.mrp - item.itemData.price.discount;
             dataToWrite = {
               products: products,
+              quantity,
               totalPrice:
                 parseInt(doc.data().totalPrice, 10) -
                 priceTobeDeductedFromTotalPrice +
-                parseInt(item.itemData.price.mrp, 10) * item.itemData.qty, // total price = mrp * quantity
+                currentPrice * item.itemData.qty, // total price = mrp * quantity
             };
-
+            console.log("this is data that is updated", {dataToWrite})
             return false;
           }
         });
@@ -71,15 +75,15 @@ const addCart = async (cart, item, req, res) => {
             quantity:doc.data().quantity+1,
             totalPrice:
               parseInt(doc.data().totalPrice, 10) +
-              (parseInt(item.itemData.price.mrp, 10)* item.itemData.qty),
+             (item.itemData.price.mrp - item.itemData.price.discount) * item.itemData.qty,
           };
         }
-        console.log("check final doc to write", dataToWrite);
+ 
         cart
           .doc(doc.id)
           .update(dataToWrite)
           .then((data) => {
-            console.log(data);
+            console.log("This is updated response",data);
             res.send("data updated");
           })
           .catch((e) => {
@@ -94,7 +98,7 @@ const addCart = async (cart, item, req, res) => {
       productList.push(item.itemData);
       let newCart = {
         quantity: 1,
-        totalPrice: item.itemData.price.mrp,
+        totalPrice: (item.itemData.price.mrp - item.itemData.price.discount),
         products: productList,
         userInfo: {
           uid: item.uid,
@@ -128,9 +132,9 @@ const deleteCartItem = async (cart, item, req, res) => {
         lodash.forEach(tempProducts, (product, key) => {
           if (product._id === item.productId) {
             console.log("****PRODUCT ID EXIST*********");
-            doc.data().totalPrice = doc.data().totalPrice - product.price.mrp;
+            doc.data().totalPrice = doc.data().totalPrice - product.price.discount;
             updatedQty = updatedQty - product.qty;
-            deductedMrp = product.price.mrp * product.qty;
+            deductedMrp = product.price.discount * product.qty;
             updatedTotalprice = updatedTotalprice - deductedMrp;
             tempProducts.splice(key, 1);
             return false;
