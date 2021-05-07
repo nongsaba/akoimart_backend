@@ -88,6 +88,11 @@ app.get("/order", (req, res) => {
   orderService.getOrder(order, req, res);
 });
 
+app.delete("/order", (req, res) => {
+  let order = db.collection("order");
+  orderService.CancelOrder(order, req, res);
+});
+
 app.post("/user", (req, res) => {
   let user = db.collection("user");
   let userData = req.body;
