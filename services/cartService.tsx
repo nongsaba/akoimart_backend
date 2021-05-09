@@ -124,27 +124,32 @@ const deleteCartItem = async (cart, item, req, res) => {
     snapshot.docs.forEach((doc) => {
       // checks whether the user exist
       if (doc.data().userInfo.uid === item.uid) {
-        console.log("inside same uer id");
+        console.log("inside same uer id",item);
         let tempProducts = doc.data().products;
         let updatedTotalprice = doc.data().totalPrice;
         let updatedQty = doc.data().quantity;
         let deductedMrp;
         lodash.forEach(tempProducts, (product, key) => {
-          if (product._id === item.productId) {
-            console.log("****PRODUCT ID EXIST*********");
-            doc.data().totalPrice = doc.data().totalPrice - product.price.discount;
-            updatedQty = updatedQty - product.qty;
-            deductedMrp = product.price.discount * product.qty;
-            updatedTotalprice = updatedTotalprice - deductedMrp;
-            tempProducts.splice(key, 1);
-            return false;
-          }
+          if(product){
+            if (product._id === item.productId) {
+              console.log("****PRODUCT ID EXIST*********");
+            
+            // doc.data().totalPrice = doc.data().totalPrice - product.price.discount;
+              updatedQty = updatedQty - product.qty;
+              deductedMrp = (product.price.mrp - product.price.discount) * product.qty;
+              updatedTotalprice = updatedTotalprice - deductedMrp;
+              console.log("checking updated price",updatedTotalprice)
+              tempProducts.splice(key, 1);
+              return false;
+            }
+        }
         });
         let doctoWrite = {
           products: tempProducts,
           quantity: updatedQty,
           totalPrice: updatedTotalprice,
         };
+        console.log("This is doc to delete",doctoWrite)
         cart
           .doc(doc.id)
           .update(doctoWrite)
