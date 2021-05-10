@@ -45,7 +45,6 @@ app.get("/cart", (req, res) => {
 app.post("/cart", (req, res) => {
   let cartItem = req.body;
   let cart = db.collection("cart");
-  console.log(cartItem);
   cartModule.addCart(cart, cartItem, req, res);
 });
 

@@ -48,31 +48,30 @@ const GetOrders = async (order, req, res) => {
 };
 
 const CancelOrder = async(order, req, res) =>{
-  let id = req.body;
-  console.log("checking query data",req.query)
-  console.log("we need to hjeck the uid", id);
-  let orderResponse = [];
+  let id = req.body.id;
+
   let responseData
+  let docId;
   await order.get().then((ordersSnapshot) => {
-    ordersSnapshot.docs.forEach((orderData) => {
-      responseData = orderData.data();
-      
-      if (id.orderId === responseData.orderId && responseData.orderStatus !== "delivered") {
-        responseData.orderStatus = "cancelled"
-        console.log("check order id id id", order.id);
-        
-      }
-      console.log("check order id id id outside", responseData);
-      order
-      .doc(orderData.id)
-      .update(responseData)
-      .then((data) => {
-        res.send("record updated successfully");
-      });
-    });
+          ordersSnapshot.docs.forEach((orderData) => {
+            responseData = orderData.data();
+                    if (id === orderData.id && responseData.orderStatus !== "delivered") {
+                      docId = orderData.id;
+                      responseData.orderStatus = "cancelled";                    
+                    }
+                  order
+                  .doc(orderData.id)
+                  .update(responseData)
+                  .then((data) => {
+                  return res.send("record updated successfully");
+                }).catch((e)=>{
+                  console.log("error",e)
+                  return res.send("There is an error while updating")
+                });
+       });
 
+  });    
 
-  });
 }
 
 exports.addOrder = OrderService;
