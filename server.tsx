@@ -97,6 +97,10 @@ app.post("/user", (req, res) => {
   let userData = req.body;
   userService.addUser(user, userData, req, res);
 });
+app.get("/user", (req, res) => {
+  let user = db.collection("user");
+  userService.fetchUser(user,req, res);
+});
 app.delete("/user", (req, res) => {
   let user = db.collection("user");
   let userData = req.body;

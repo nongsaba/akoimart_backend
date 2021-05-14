@@ -28,6 +28,23 @@ const AddUser = async (user, userData, req, res) => {
   });
 };
 
+const fetchUserDetails = async (user, req, res) =>{
+  let uid = req.uid
+  let responseData = {uid:"",mobileNumber:""};
+
+  await user.get().then((snapshot) => {
+    
+    snapshot.docs.forEach((doc) => {
+      if (doc.data().uid === uid) {
+         responseData.uid = doc.data().uid;
+         responseData.mobileNumber = doc.data().mobileNumber;
+      }
+    });
+    console.log("User Data",responseData)
+    return res.send(responseData)
+  });
+}
+
 // const Logout = async (user, userData, req, res) => {
 //   // fetched list of item from the cart
 //   let uid = userData.uid;
@@ -66,3 +83,4 @@ const Logout = async (user, userData, req, res) => {
 
 exports.addUser = AddUser;
 exports.deleteUser = Logout;
+exports.fetchUser = fetchUserDetails
