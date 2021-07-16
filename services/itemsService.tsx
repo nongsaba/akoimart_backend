@@ -122,7 +122,6 @@ const fetchItems = async (Items, Price, req, res) => {
   }
 
   if(req.query.popular){
-    console.log("discount with cat id 4")
     let discount = req.query.discount
     // add category later
     await Items.get().then((snapshot) => {
@@ -142,7 +141,7 @@ const fetchItems = async (Items, Price, req, res) => {
       });
     });
   }
- console.log("to be sent", items);
+
  response = {
    items,
    meta:{
