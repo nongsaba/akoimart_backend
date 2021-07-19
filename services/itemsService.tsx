@@ -25,7 +25,7 @@ const fetchItems = async (Items, Price, req, res) => {
     let pageOffset = req.query.offset;
     let catArray = []
     catArray.push(category)
-    console.log("discount with cat id")
+  //  console.log("discount with cat id")
     await Items.where(`category`,"array-contains-any",catArray).orderBy('lname').get().then((snapshot) => {
       itemsCount = snapshot.docs.length;
     });
@@ -64,7 +64,7 @@ const fetchItems = async (Items, Price, req, res) => {
   // }
   // Executes when catId is there and discount > 0 
   if(req.query.catId && parseInt(req.query.discount,10) > 0 ){
-    console.log("discount with cat id 3")
+   // console.log("discount with cat id 3")
     let catArray = [];
     if(Array.isArray(req.query.catId)){
       catArray = req.query.catId;
@@ -75,7 +75,7 @@ const fetchItems = async (Items, Price, req, res) => {
     let discount = req.query.discount
     let category = req.query.catId;
     let pageOffset = req.query.offset;
-    console.log("discount with cat id")
+   // console.log("discount with cat id")
     // await Items.where(`category.${category}`,'==',true).where("price.discountPercent",">=",discount).orderBy('price.discountPercent').get().then((snapshot) => {
     //   itemsCount = snapshot.docs.length;
     // });

@@ -13,7 +13,7 @@ const AddUser = async (user, userData, req, res) => {
     });
 
     if (!userExist) {
-      console.log("user exist user exist");
+     // console.log("user exist user exist");
       user
         .doc()
         .set(userData)
@@ -22,7 +22,7 @@ const AddUser = async (user, userData, req, res) => {
         });
     }
     if(userExist){
-      console.log("user exist");
+    //  console.log("user exist");
       return res.send("existing user");
     }
   });

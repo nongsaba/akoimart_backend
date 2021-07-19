@@ -8,7 +8,7 @@ const AddressService = async (Item, req, res) => {
     itemSnapshot.docs.forEach((val, key) => {
       if (uid) {
         if (val.data().uid === uid) {
-          console.log("uid checked uid checked");
+       //   console.log("uid checked uid checked");
           responseObj["fname"] = val.data().fname;
           responseObj["lname"] = val.data().lname;
           responseObj["mobileNumber"] = val.data().mobileNumber;
