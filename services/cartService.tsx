@@ -86,9 +86,9 @@ const addCart = async (cart, item, req, res) => {
         let productExist = false;
         let quantity;
         let priceTobeDeductedFromTotalPrice;
-        let rice_weight;
+        let rice_weight = 0;
         let rice_qty = docdata.riceQty;
-        let delivery_charge_for_rice_weight;
+        let delivery_charge_for_rice_weight = 0;
         lodash.forEach(products, (val, key) => {
           if (item.itemData._id === val._id) {
             priceTobeDeductedFromTotalPrice = val.qty * (val.price.mrp - val.price.discount); // to be deducted from the totalprice if the item is added
@@ -136,7 +136,7 @@ const addCart = async (cart, item, req, res) => {
             dataToWrite = {
               products: products,
               quantity,
-              riceWeight:rice_weight,
+              riceWeight:rice_weight ? rice_weight  : 0,
               deliveryChargeForRiceWeight:delivery_charge_for_rice_weight,
               riceQty:rice_qty ? rice_qty : 0,
               totalPrice:
@@ -171,7 +171,7 @@ const addCart = async (cart, item, req, res) => {
           dataToWrite = {
             products: products,
             riceWeight:tempRiceWeight,
-            deliveryChargeForRiceWeight:calculateRiceDeliverCharge(deliverChargeBasedOnRiceWeight,tempRiceWeight,tempRiceQty),
+            deliveryChargeForRiceWeight:calculateRiceDeliverCharge(deliverChargeBasedOnRiceWeight,tempRiceWeight,tempRiceQty)?calculateRiceDeliverCharge(deliverChargeBasedOnRiceWeight,tempRiceWeight,tempRiceQty):0,
             riceQty:tempRiceQty,
             quantity:qtyTobeUsed,
             totalPrice:
