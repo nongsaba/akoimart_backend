@@ -75,6 +75,9 @@ const addCart = async (cart, item, req, res) => {
       if(!docdata.riceWeight){// For items where riceWeight is undefined as it was added later
         docdata.riceWeight = 0;
       }
+      if(!docdata.rice25and50KgTotalPrice){// For items where rice25and50Kg is undefined as it was added later
+        docdata.rice25and50KgTotalPrice= 0;
+      }
 
       // checks whther the user exist
       if (docdata.userInfo.uid === item.uid) {
@@ -89,12 +92,16 @@ const addCart = async (cart, item, req, res) => {
         let rice_weight = 0;
         let rice_qty = docdata.riceQty;
         let delivery_charge_for_rice_weight = 0;
+
+        let riceTotalPrice25and50kg = 0;
+
         lodash.forEach(products, (val, key) => {
           if (item.itemData._id === val._id) {
             priceTobeDeductedFromTotalPrice = val.qty * (val.price.mrp - val.price.discount); // to be deducted from the totalprice if the item is added
+            let currentPrice = item.itemData.price.mrp - item.itemData.price.discount; // Actual price of the item
             productExist = true;
             if (!item.updateQty) {
-              // Checks if the qty needs to be updated or is it through the item add to cart
+              // Checks if the qty needs to be updated or is it through the item added from item section to cart
               products[key] = val;
               quantity = docdata.quantity + val.qty;
              // console.log("This is the value that is executed",docdata.riceWeight)
@@ -111,10 +118,10 @@ const addCart = async (cart, item, req, res) => {
                 //  rice_weight += val.item_attributes.weight * val.qty ;
                   delivery_charge_for_rice_weight = calculateRiceDeliverCharge(deliverChargeBasedOnRiceWeight, rice_weight, rice_qty)
                 }
-           }
+             }
             } else {
               products[key] = item.itemData;
-              /* updates the total quantity on qty change */
+              /* updates the total quantity on qty change in the cart section */
               quantity = (docdata.quantity - val.qty) + item.qty; 
 
               //check whether the item is 25 or 50 kg rice and adds rice weight and delivery_charge_for_rice_weight 
@@ -127,17 +134,19 @@ const addCart = async (cart, item, req, res) => {
               rice_weight = docdata.riceWeight - (val.item_attributes.weight * val.qty) // substracting previous weight from total rice weight
               rice_weight = rice_weight + (val.item_attributes.weight * item.qty) // adding new weight to the total rice weight
               rice_qty = (docdata.riceQty - val.qty) + item.qty; 
+              riceTotalPrice25and50kg = docdata.rice25and50KgTotalPrice - priceTobeDeductedFromTotalPrice + (currentPrice * item.itemData.qty);
             //  rice_weight += val.item_attributes.weight * val.qty ;
               delivery_charge_for_rice_weight = calculateRiceDeliverCharge(deliverChargeBasedOnRiceWeight, rice_weight,rice_qty)
              }
             }
             }
-            let currentPrice = item.itemData.price.mrp - item.itemData.price.discount;
+
             dataToWrite = {
               products: products,
               quantity,
               riceWeight:rice_weight ? rice_weight  : 0,
               deliveryChargeForRiceWeight:delivery_charge_for_rice_weight,
+              rice25and50KgTotalPrice:riceTotalPrice25and50kg,
               riceQty:rice_qty ? rice_qty : 0,
               totalPrice:
                 parseInt(doc.data().totalPrice, 10) -
@@ -151,6 +160,7 @@ const addCart = async (cart, item, req, res) => {
 
         let tempRiceWeight = 0;
         let tempRiceQty = 0;
+
         // if(!docdata.riceQty){ // For items where riceQty is undefined as it was added later
         //   docdata.riceQty = 0;
         // }
@@ -159,11 +169,15 @@ const addCart = async (cart, item, req, res) => {
         // }
         if(item.itemData.item_attributes){
           tempRiceWeight = docdata.riceWeight + (item.itemData.item_attributes.weight * item.itemData.qty )
+          riceTotalPrice25and50kg = docdata.rice25and50KgTotalPrice + (item.itemData.price.mrp - item.itemData.price.discount) * item.itemData.qty
           tempRiceQty = docdata.riceQty + 1; 
         }else{
           tempRiceQty = docdata.riceQty ;
+          tempRiceWeight = docdata.riceWeight;
+          riceTotalPrice25and50kg = docdata.rice25and50KgTotalPrice;
+          console.log("product does not exist",riceTotalPrice25and50kg)
         }
-        console.log("product does not exist",item.itemData)
+      
         if (!productExist) {
           // Product does not exist
           products.push(item.itemData);
@@ -173,6 +187,7 @@ const addCart = async (cart, item, req, res) => {
             riceWeight:tempRiceWeight,
             deliveryChargeForRiceWeight:calculateRiceDeliverCharge(deliverChargeBasedOnRiceWeight,tempRiceWeight,tempRiceQty)?calculateRiceDeliverCharge(deliverChargeBasedOnRiceWeight,tempRiceWeight,tempRiceQty):0,
             riceQty:tempRiceQty,
+            rice25and50KgTotalPrice:riceTotalPrice25and50kg,
             quantity:qtyTobeUsed,
             totalPrice:
               parseInt(doc.data().totalPrice, 10) +
@@ -197,15 +212,20 @@ const addCart = async (cart, item, req, res) => {
       // Adding a new cart for new user
       let productList = [];
       let riceWeight = 0;
-      if(item.itemData.item_attributes){
+      let rice25and50KgTotalPrice = 0;
+      let riceQty = 0;
+      if(item.itemData.item_attributes){ // If the item is rice 25 and 50 kgs add the below keys to get the extra delivery charge
         riceWeight = item.itemData.item_attributes.weight * item.itemData.qty 
+        rice25and50KgTotalPrice = item.itemData.price.mrp - item.itemData.price.discount; 
+        riceQty = 1;
       }
       productList.push(item.itemData);
       let newCart = {
         quantity: 1,
-        riceQty:1,
+        riceQty,
         riceWeight:riceWeight,
         deliveryChargeForRiceWeight:calculateRiceDeliverCharge(deliverChargeBasedOnRiceWeight, riceWeight, 1),
+        rice25and50KgTotalPrice,
         totalPrice: (item.itemData.price.mrp - item.itemData.price.discount),
         products: productList,
         userInfo: {
@@ -237,9 +257,11 @@ const deleteCartItem = async (cart, item, req, res) => {
         let updatedTotalprice = doc.data().totalPrice;
         let updatedQty = doc.data().quantity;
         let riceQty = doc.data().riceQty;
+        let rice25and50KgTotalPrice = doc.data().rice25and50KgTotalPrice
         //const {riceWeight,deliveryChargeForRiceWeight} =  doc.data()
         let deductedMrp;
-        let rice_weight,delivery_charge_for_rice_weight;
+        let rice_weight;
+        let delivery_charge_for_rice_weight = doc.data().deliveryChargeForRiceWeight;
         lodash.forEach(tempProducts, (product, key) => {
           if(product){
             if (product._id === item.productId) {
@@ -256,9 +278,16 @@ const deleteCartItem = async (cart, item, req, res) => {
                if(product.item_attributes.weight === 25 || product.item_attributes.weight === 50){
                 rice_weight = doc.data().riceWeight - (product.item_attributes.weight * product.qty) // substracting previous weight from total rice weight
                 riceQty = riceQty - product.qty;
+                rice25and50KgTotalPrice = rice25and50KgTotalPrice - (product.price.mrp - product.price.discount) * product.qty;
                 // rice_weight = rice_weight + (val.item_attributes.weight * item.qty) // adding new weight to the total rice weight
                 // rice_weight += val.item_attributes.weight * val.qty ;
-                delivery_charge_for_rice_weight = calculateRiceDeliverCharge(deliverChargeBasedOnRiceWeight, rice_weight,riceQty)
+
+                delivery_charge_for_rice_weight = doc.data().deliveryChargeForRiceWeight - calculateRiceDeliverCharge(deliverChargeBasedOnRiceWeight, rice_weight,riceQty)
+
+                if(riceQty === 0 && rice_weight === 0){ // Executes when there is no rice of 25 and 50 kg in the cart
+                  delivery_charge_for_rice_weight = 0
+                }
+
             }
           }
               console.log("checking updated price",updatedTotalprice)
@@ -272,7 +301,8 @@ const deleteCartItem = async (cart, item, req, res) => {
           quantity: updatedQty,
           riceQty,
           riceWeight:rice_weight ? rice_weight : 0,
-          deliveryChargeForRiceWeight:delivery_charge_for_rice_weight? delivery_charge_for_rice_weight:0,
+          rice25and50KgTotalPrice,
+          deliveryChargeForRiceWeight:delivery_charge_for_rice_weight ? delivery_charge_for_rice_weight:0,
           totalPrice: updatedTotalprice,
         };
         console.log("This is doc to delete",doctoWrite)
