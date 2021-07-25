@@ -89,11 +89,12 @@ const addCart = async (cart, item, req, res) => {
         let productExist = false;
         let quantity;
         let priceTobeDeductedFromTotalPrice;
-        let rice_weight = 0;
-        let rice_qty = docdata.riceQty;
-        let delivery_charge_for_rice_weight = 0;
 
-        let riceTotalPrice25and50kg = 0;
+        // Below 4 variables are for 25 aND 50 kg rice setting the vaues to default db values
+        let rice_weight = docdata.riceWeight;
+        let rice_qty = docdata.riceQty;
+        let delivery_charge_for_rice_weight = docdata.deliveryChargeForRiceWeight;
+        let riceTotalPrice25and50kg = docdata.rice25and50KgTotalPrice;
 
         lodash.forEach(products, (val, key) => {
           if (item.itemData._id === val._id) {
@@ -131,8 +132,8 @@ const addCart = async (cart, item, req, res) => {
               //  if(docdata.rice_weight <= (val.item_attributes.weight * val.qty)){
 
               //  }
-              rice_weight = docdata.riceWeight - (val.item_attributes.weight * val.qty) // substracting previous weight from total rice weight
-              rice_weight = rice_weight + (val.item_attributes.weight * item.qty) // adding new weight to the total rice weight
+              let tmp_rice_weight = docdata.riceWeight - (val.item_attributes.weight * val.qty) // substracting previous weight from total rice weight
+              rice_weight = tmp_rice_weight + (val.item_attributes.weight * item.qty) // adding new weight to the total rice weight
               rice_qty = (docdata.riceQty - val.qty) + item.qty; 
               riceTotalPrice25and50kg = docdata.rice25and50KgTotalPrice - priceTobeDeductedFromTotalPrice + (currentPrice * item.itemData.qty);
             //  rice_weight += val.item_attributes.weight * val.qty ;
@@ -199,7 +200,6 @@ const addCart = async (cart, item, req, res) => {
           .doc(doc.id)
           .update(dataToWrite)
           .then((data) => {
-            console.log("This is updated response",data);
             res.send("data updated");
           })
           .catch((e) => {
@@ -237,7 +237,6 @@ const addCart = async (cart, item, req, res) => {
         .doc()
         .set(newCart)
         .then((recAdded) => {
-          console.log("rec added rec added", recAdded);
           res.send("recored added");
         });
     }
@@ -260,7 +259,7 @@ const deleteCartItem = async (cart, item, req, res) => {
         let rice25and50KgTotalPrice = doc.data().rice25and50KgTotalPrice
         //const {riceWeight,deliveryChargeForRiceWeight} =  doc.data()
         let deductedMrp;
-        let rice_weight;
+        let rice_weight = doc.data().riceWeight;
         let delivery_charge_for_rice_weight = doc.data().deliveryChargeForRiceWeight;
         lodash.forEach(tempProducts, (product, key) => {
           if(product){
@@ -282,7 +281,7 @@ const deleteCartItem = async (cart, item, req, res) => {
                 // rice_weight = rice_weight + (val.item_attributes.weight * item.qty) // adding new weight to the total rice weight
                 // rice_weight += val.item_attributes.weight * val.qty ;
 
-                delivery_charge_for_rice_weight = doc.data().deliveryChargeForRiceWeight - calculateRiceDeliverCharge(deliverChargeBasedOnRiceWeight, rice_weight,riceQty)
+                delivery_charge_for_rice_weight = doc.data().deliveryChargeForRiceWeight - calculateRiceDeliverCharge(deliverChargeBasedOnRiceWeight, rice_weight,product.qty)
 
                 if(riceQty === 0 && rice_weight === 0){ // Executes when there is no rice of 25 and 50 kg in the cart
                   delivery_charge_for_rice_weight = 0
@@ -290,7 +289,6 @@ const deleteCartItem = async (cart, item, req, res) => {
 
             }
           }
-              console.log("checking updated price",updatedTotalprice)
               tempProducts.splice(key, 1);
               return false;
             }
@@ -305,7 +303,6 @@ const deleteCartItem = async (cart, item, req, res) => {
           deliveryChargeForRiceWeight:delivery_charge_for_rice_weight ? delivery_charge_for_rice_weight:0,
           totalPrice: updatedTotalprice,
         };
-        console.log("This is doc to delete",doctoWrite)
         cart
           .doc(doc.id)
           .update(doctoWrite)
