@@ -87,7 +87,7 @@ const addCart = async (cart, item, req, res) => {
         //docdata.quantity = docdata.quantity + 1; // add only 1 item to the cart quatity of items is mainained separately
         // checks if the item already is added
         let productExist = false;
-        let quantity;
+        let quantity = docdata.quantity;
         let priceTobeDeductedFromTotalPrice;
 
         // Below 4 variables are for 25 aND 50 kg rice setting the vaues to default db values
@@ -182,7 +182,7 @@ const addCart = async (cart, item, req, res) => {
         if (!productExist) {
           // Product does not exist
           products.push(item.itemData);
-          let qtyTobeUsed = doc.data().quantity+1;
+          let qtyTobeUsed = doc.data().quantity+item.itemData.qty;
           dataToWrite = {
             products: products,
             riceWeight:tempRiceWeight,
@@ -221,7 +221,7 @@ const addCart = async (cart, item, req, res) => {
       }
       productList.push(item.itemData);
       let newCart = {
-        quantity: 1,
+        quantity: item.qty,
         riceQty,
         riceWeight:riceWeight,
         deliveryChargeForRiceWeight:calculateRiceDeliverCharge(deliverChargeBasedOnRiceWeight, riceWeight, 1),
