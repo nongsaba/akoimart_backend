@@ -171,12 +171,11 @@ const addCart = async (cart, item, req, res) => {
         if(item.itemData.item_attributes){
           tempRiceWeight = docdata.riceWeight + (item.itemData.item_attributes.weight * item.itemData.qty )
           riceTotalPrice25and50kg = docdata.rice25and50KgTotalPrice + (item.itemData.price.mrp - item.itemData.price.discount) * item.itemData.qty
-          tempRiceQty = docdata.riceQty + 1; 
+          tempRiceQty = docdata.riceQty + item.itemData.qty; 
         }else{
           tempRiceQty = docdata.riceQty ;
           tempRiceWeight = docdata.riceWeight;
           riceTotalPrice25and50kg = docdata.rice25and50KgTotalPrice;
-          console.log("product does not exist",riceTotalPrice25and50kg)
         }
       
         if (!productExist) {
@@ -217,14 +216,14 @@ const addCart = async (cart, item, req, res) => {
       if(item.itemData.item_attributes){ // If the item is rice 25 and 50 kgs add the below keys to get the extra delivery charge
         riceWeight = item.itemData.item_attributes.weight * item.itemData.qty 
         rice25and50KgTotalPrice = item.itemData.price.mrp - item.itemData.price.discount; 
-        riceQty = 1;
+        riceQty = item.itemData.qty ;
       }
       productList.push(item.itemData);
       let newCart = {
-        quantity: item.qty,
+        quantity: item.itemData.qty,
         riceQty,
         riceWeight:riceWeight,
-        deliveryChargeForRiceWeight:calculateRiceDeliverCharge(deliverChargeBasedOnRiceWeight, riceWeight, 1),
+        deliveryChargeForRiceWeight:calculateRiceDeliverCharge(deliverChargeBasedOnRiceWeight,riceWeight,riceQty)?calculateRiceDeliverCharge(deliverChargeBasedOnRiceWeight,riceWeight,riceQty):0,
         rice25and50KgTotalPrice,
         totalPrice: (item.itemData.price.mrp - item.itemData.price.discount),
         products: productList,
