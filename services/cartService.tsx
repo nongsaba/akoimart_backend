@@ -213,19 +213,21 @@ const addCart = async (cart, item, req, res) => {
       let riceWeight = 0;
       let rice25and50KgTotalPrice = 0;
       let riceQty = 0;
+      let deliveryChargeForRiceWeight = 0;
       if(item.itemData.item_attributes){ // If the item is rice 25 and 50 kgs add the below keys to get the extra delivery charge
         riceWeight = item.itemData.item_attributes.weight * item.itemData.qty 
         rice25and50KgTotalPrice = item.itemData.price.mrp - item.itemData.price.discount; 
         riceQty = item.itemData.qty ;
+        deliveryChargeForRiceWeight = calculateRiceDeliverCharge(deliverChargeBasedOnRiceWeight,riceWeight,riceQty)
       }
       productList.push(item.itemData);
       let newCart = {
         quantity: item.itemData.qty,
         riceQty,
         riceWeight:riceWeight,
-        deliveryChargeForRiceWeight:calculateRiceDeliverCharge(deliverChargeBasedOnRiceWeight,riceWeight,riceQty)?calculateRiceDeliverCharge(deliverChargeBasedOnRiceWeight,riceWeight,riceQty):0,
+        deliveryChargeForRiceWeight,
         rice25and50KgTotalPrice,
-        totalPrice: (item.itemData.price.mrp - item.itemData.price.discount),
+        totalPrice: (item.itemData.price.mrp - item.itemData.price.discount) * item.itemData.qty,
         products: productList,
         userInfo: {
           uid: item.uid,
