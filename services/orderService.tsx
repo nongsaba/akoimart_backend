@@ -5,7 +5,7 @@ const OrderService = async (order, orderData, cart, req, res) => {
     .doc()
     .set(orderData)
     .then((data) => {
-      console.log("order data", data);
+      // console.log("order data", data);
       cart.get().then((snapshot) => {
         snapshot.docs.forEach((doc) => {
           if (doc.data().userInfo.uid === orderData.uid) {
@@ -13,6 +13,10 @@ const OrderService = async (order, orderData, cart, req, res) => {
             cartProduct.products = [];
             cartProduct.quantity = 0;
             cartProduct.totalPrice = 0;
+            cartProduct.riceWeight = 0;
+            cartProduct.riceQty = 0;
+            cartProduct.deliveryChargeForRiceWeight = 0;
+            cartProduct.rice25and50KgTotalPrice = 0;
             cart // clearing the cart data after the order is successful
               .doc(doc.id)
               .update(cartProduct)
@@ -28,16 +32,14 @@ const OrderService = async (order, orderData, cart, req, res) => {
 
 const GetOrders = async (order, req, res) => {
   let uid = req.query.uid;
-  console.log("we need to hjeck the uid", uid);
   let orderResponse = [];
   await order.get().then((ordersSnapshot) => {
     ordersSnapshot.docs.forEach((order) => {
       let responseData = order.data();
-       console.log(responseData.uid)
-       console.log(uid)
+      //  console.log(responseData.uid)
+      //  console.log(uid)
       if (uid === responseData.uid ) {
         responseData.orderId = order.id;
-        console.log("check order id id id", order.id);
         orderResponse.push(responseData);
       }
     });
@@ -55,22 +57,25 @@ const CancelOrder = async(order, req, res) =>{
   await order.get().then((ordersSnapshot) => {
           ordersSnapshot.docs.forEach((orderData) => {
             responseData = orderData.data();
-                    if (id === orderData.id && (responseData.orderStatus.toLowerCase() !== "delivered" &&  responseData.orderStatus.toLowerCase() !== "out for delivery")) {
-                       return res.send("Cannot cancel order")               
-                    }
-                    if (id === orderData.id) {
+                  // if (id === orderData.id && (responseData.orderStatus.toLowerCase() === "cancelled" || responseData.orderStatus.toLowerCase() === "out for delivery")) {
+                  //      console.log("cancel order")
+                  //      return res.send("Order already cancelled")               
+                  // }
+                  if (id === orderData.id) {              
                       docId = orderData.id;
-                      responseData.orderStatus = "cancelled";                    
-                    }
-                  order
-                  .doc(orderData.id)
-                  .update(responseData)
-                  .then((data) => {
-                  return res.send("record updated successfully");
-                }).catch((e)=>{
-                  console.log("error",e)
-                  return res.send("There is an error while updating")
-                });
+                      responseData.orderStatus = "cancelled";    
+
+                      order
+                      .doc(orderData.id)
+                      .update(responseData)
+                      .then((data) => {
+                      return res.send("record updated successfully");
+                    }).catch((e)=>{
+                      console.log("error",e)
+                      return res.send("There is an error while updating")
+                    });                
+                  }
+             
        });
 
   });    

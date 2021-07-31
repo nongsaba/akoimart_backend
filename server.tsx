@@ -113,6 +113,10 @@ app.get("/partners",(req, res)=>{
   addressService.fetchPartners(partners, req, res);
 })
 
+app.get("/currentAppVersion",(req, res)=>{
+    res.send({currentAppVersion:'1.4.10'})
+})
+
 app.listen(port, () => {
   // tslint:disable-next-line:no-console
   console.log(`server started at http://localhost:${port}`);

@@ -101,7 +101,7 @@ const addCart = async (cart, item, req, res) => {
             priceTobeDeductedFromTotalPrice = val.qty * (val.price.mrp - val.price.discount); // to be deducted from the totalprice if the item is added
             let currentPrice = item.itemData.price.mrp - item.itemData.price.discount; // Actual price of the item
             productExist = true;
-            if (!item.updateQty) {
+            if (!item.updateQty) { // Executes when item added through item section
               // Checks if the qty needs to be updated or is it through the item added from item section to cart
               products[key] = val;
               quantity = docdata.quantity + val.qty;
@@ -181,7 +181,7 @@ const addCart = async (cart, item, req, res) => {
         if (!productExist) {
           // Product does not exist
           products.push(item.itemData);
-          let qtyTobeUsed = doc.data().quantity+item.itemData.qty;
+          let qtyTobeUsed = doc.data().quantity + item.itemData.qty;
           dataToWrite = {
             products: products,
             riceWeight:tempRiceWeight,
