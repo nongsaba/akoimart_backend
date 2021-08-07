@@ -114,7 +114,7 @@ app.get("/partners",(req, res)=>{
 })
 
 app.get("/currentAppVersion",(req, res)=>{
-    res.send({currentAppVersion:'1.4.12'})
+    res.send({currentAppVersion:'1.4.13'})
 })
 
 app.listen(port, () => {
