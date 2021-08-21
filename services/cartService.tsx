@@ -47,7 +47,7 @@ const fetchCart = async (cart, req, res) => {
   if(uid){
   await cart.get().then((snapshot) => {
     snapshot.docs.forEach((doc) => {
-      if (doc.data().userInfo.uid === uid) {
+      if (doc.data().userInfo && doc.data().userInfo.uid === uid) {
         console.log(doc.data());
         response = doc.data();
         items.push(response);
@@ -64,7 +64,7 @@ const addCart = async (cart, item, req, res) => {
 
   let userExist = false;
   let dataToWrite = {};
-
+  // console.log("checking the cart Item", item)
   await cart.get().then((snapshot) => {
     snapshot.docs.forEach((doc, index) => {
       let docdata = doc.data();
@@ -79,8 +79,9 @@ const addCart = async (cart, item, req, res) => {
         docdata.rice25and50KgTotalPrice= 0;
       }
 
+     
       // checks whther the user exist
-      if (docdata.userInfo.uid === item.uid) {
+      if (docdata.userInfo && docdata.userInfo.uid === item.uid) {
 
         let products = doc.data().products;
         userExist = true;
