@@ -252,7 +252,7 @@ const deleteCartItem = async (cart, item, req, res) => {
   await cart.get().then((snapshot) => {
     snapshot.docs.forEach((doc) => {
       // checks whether the user exist
-      if (doc.data().userInfo.uid === item.uid) {
+      if (doc.data().userInfo && doc.data().userInfo.uid === item.uid) {
         console.log("inside same uer id",item);
         let tempProducts = doc.data().products;
         let updatedTotalprice = doc.data().totalPrice;
